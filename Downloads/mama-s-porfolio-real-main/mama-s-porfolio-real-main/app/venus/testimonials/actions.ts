@@ -15,7 +15,7 @@ const testimonialSchema = z.object({
 })
 
 export async function getTestimonials() {
-  const supabase = createServerClient()
+  const supabase = createAdminClient()
   const { data, error } = await supabase.from("testimonials").select("*").order("created_at", { ascending: false })
 
   if (error) {

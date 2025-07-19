@@ -32,7 +32,7 @@ async function deleteImage(imageUrl: string) {
 }
 
 export async function getWorks(isFavorite?: boolean) {
-  const supabase = createServerClient()
+  const supabase = createAdminClient()
   let query = supabase
     .from("works")
     .select("*, image_width, image_height, is_favorite, type, video_url")

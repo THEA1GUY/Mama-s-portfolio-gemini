@@ -10,6 +10,7 @@ import { getContentSettings } from "@/app/venus/settings/actions" // Import new 
 
 interface ContentSetting {
   id: string
+  created_at: string
   key: string
   value_text: string | null
   value_image_url: string | null
