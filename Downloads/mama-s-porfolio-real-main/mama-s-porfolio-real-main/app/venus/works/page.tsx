@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/hooks/use-toast"
-import { addWork, getWorks, updateWork, deleteWork } from "./actions"
+import { addWork, getWorks, updateWork, deleteWork, getSignedUploadUrl } from "./actions"
 import { FileUpload } from "@/components/ui/file-upload"
 import { Loader2, PlusCircle, Edit, Trash2, Star } from "lucide-react"
 import Image from "next/image"
@@ -28,16 +28,11 @@ interface Work {
   image_width: number | null
   image_height: number | null
   is_favorite: boolean | null
+  type: "image" | "video"
+  video_url: string | null
 }
 
-const categories = [
-  "Photography",
-  "Digital Art",
-  "Cultural Documentation",
-  "Mixed Media",
-  "Fine Art",
-  "Contemporary Art",
-]
+const categories = ["Photography", "Videography"]
 
 export default function AdminWorksPage() {
   const [works, setWorks] = useState<Work[]>([])
@@ -45,11 +40,9 @@ export default function AdminWorksPage() {
   const [isPending, startTransition] = useTransition()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingWork, setEditingWork] = useState<Work | null>(null)
-  const [fileToUpload, setFileToUpload] = useState<{
-    file: File | null
-    dimensions: { width: number; height: number } | null
-  }>({ file: null, dimensions: null })
-  const [isFavoriteState, setIsFavoriteState] = useState(false) // New state for favorite checkbox
+  const [fileToUpload, setFileToUpload] = useState<{ file: File | null; dimensions: { width: number; height: number } | null }>({ file: null, dimensions: null })
+  const [isFavoriteState, setIsFavoriteState] = useState(false)
+  const [workType, setWorkType] = useState<"image" | "video">("image")
   const { toast } = useToast()
 
   const fetchWorks = async () => {
@@ -75,56 +68,56 @@ export default function AdminWorksPage() {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
 
-    // Append the actual File object and its dimensions if it exists
-    if (fileToUpload.file) {
-      formData.append("imageFile", fileToUpload.file)
-      if (fileToUpload.dimensions) {
-        formData.append("imageWidth", fileToUpload.dimensions.width.toString())
-        formData.append("imageHeight", fileToUpload.dimensions.height.toString())
-      }
-    } else if (editingWork && !editingWork.image_url) {
-      // If editing and image was removed, ensure no file is sent
-      formData.delete("imageFile")
-      formData.delete("imageWidth") // Ensure dimensions are also removed
-      formData.delete("imageHeight") // Ensure dimensions are also removed
-    }
-
-    // If editing, pass the current image URL and dimensions to the action
-    if (editingWork) {
-      formData.append("currentImageUrl", editingWork.image_url || "")
-      // Only pass current dimensions if no new file is being uploaded
-      if (!fileToUpload.file) {
-        formData.append("currentImageWidth", editingWork.image_width?.toString() || "")
-        formData.append("currentImageHeight", editingWork.image_height?.toString() || "")
-      }
-    }
-
-    // Use the state for is_favorite
-    formData.append("is_favorite", isFavoriteState ? "true" : "false")
-    console.log("Frontend: isFavorite checkbox value (from state):", isFavoriteState) // ADDED LOG
-
     startTransition(async () => {
-      let result
-      if (editingWork) {
-        result = await updateWork(editingWork.id, formData)
-      } else {
-        result = await addWork(formData)
-      }
-      console.log("Frontend: addWork/updateWork result:", result) // ADDED LOG
+      try {
+        let imageUrl: string | null = editingWork?.image_url || null
 
-      if (result.success) {
-        toast({
-          title: "Success",
-          description: result.message,
-        })
-        setIsDialogOpen(false)
-        setEditingWork(null)
-        setFileToUpload({ file: null, dimensions: null }) // Reset file and dimensions
-        fetchWorks()
-      } else {
+        if (fileToUpload.file) {
+          const presignedUrlResult = await getSignedUploadUrl(fileToUpload.file.name, fileToUpload.file.type, "works-images")
+          if (!presignedUrlResult.success || !presignedUrlResult.data) {
+            throw new Error(presignedUrlResult.message)
+          }
+
+          const { data: presignedData } = presignedUrlResult
+          if (!presignedData) {
+            throw new Error("Failed to get presigned URL data.")
+          }
+
+          await fetch(presignedData.signedUrl, {
+            method: "PUT",
+            body: fileToUpload.file,
+            headers: { "Content-Type": fileToUpload.file.type },
+          })
+          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+          imageUrl = `${supabaseUrl}/storage/v1/object/public/works-images/${presignedData.path}`
+          formData.set("image_url", imageUrl)
+          if (fileToUpload.dimensions) {
+            formData.set("image_width", fileToUpload.dimensions.width.toString())
+            formData.set("image_height", fileToUpload.dimensions.height.toString())
+          }
+        }
+
+        formData.set("type", workType)
+        formData.set("is_favorite", isFavoriteState ? "true" : "false")
+
+        const result = editingWork ? await updateWork(editingWork.id, formData) : await addWork(formData)
+
+        if (result.success) {
+          toast({
+            title: "Success",
+            description: result.message,
+          })
+          setIsDialogOpen(false)
+          setEditingWork(null)
+          setFileToUpload({ file: null, dimensions: null })
+          fetchWorks()
+        } else {
+          throw new Error(result.message)
+        }
+      } catch (error: any) {
         toast({
           title: "Error",
-          description: result.message,
+          description: error.message || "An unexpected error occurred.",
           variant: "destructive",
         })
       }
@@ -154,15 +147,17 @@ export default function AdminWorksPage() {
 
   const openAddDialog = () => {
     setEditingWork(null)
-    setFileToUpload({ file: null, dimensions: null }) // Reset file and dimensions
-    setIsFavoriteState(false) // Initialize favorite state for new work
+    setFileToUpload({ file: null, dimensions: null })
+    setIsFavoriteState(false)
+    setWorkType("image")
     setIsDialogOpen(true)
   }
 
   const openEditDialog = (work: Work) => {
     setEditingWork(work)
-    setFileToUpload({ file: null, dimensions: null }) // Reset file and dimensions when opening edit dialog
-    setIsFavoriteState(work.is_favorite || false) // Set favorite state from existing work
+    setFileToUpload({ file: null, dimensions: null })
+    setIsFavoriteState(work.is_favorite || false)
+    setWorkType(work.type || "image")
     setIsDialogOpen(true)
   }
 
@@ -191,7 +186,7 @@ export default function AdminWorksPage() {
               <TableHeader>
                 <TableRow className="border-purple-500/20">
                   <TableHead className="w-[40px]">Fav</TableHead>
-                  <TableHead className="w-[80px]">Image</TableHead>
+                  <TableHead className="w-[80px]">Media</TableHead>
                   <TableHead>Title</TableHead>
                   <TableHead>Category</TableHead>
                   <TableHead>Description</TableHead>
@@ -205,7 +200,15 @@ export default function AdminWorksPage() {
                       {work.is_favorite && <Star className="h-4 w-4 fill-african-ochre text-african-ochre" />}
                     </TableCell>
                     <TableCell>
-                      {work.image_url && work.image_width && work.image_height ? (
+                      {work.thumbnail_url ? (
+                        <Image
+                          src={work.thumbnail_url}
+                          alt={work.title}
+                          width={56}
+                          height={56}
+                          className="rounded-md object-cover aspect-square"
+                        />
+                      ) : (work.type === "image" || !work.type) && work.image_url && work.image_width && work.image_height ? (
                         <Image
                           src={work.image_url || "/placeholder.svg"}
                           alt={work.title}
@@ -213,11 +216,17 @@ export default function AdminWorksPage() {
                           height={work.image_height}
                           className="rounded-md object-cover aspect-square"
                         />
-                      ) : (
-                        <div className="w-14 h-14 bg-gray-700 rounded-md flex items-center justify-center text-gray-400 text-xs">
-                          No Image
+                      ) : work.type === "video" && work.video_url ? (
+                        <div className="w-14 h-14 bg-gray-700 rounded-md flex items-center justify-center text-gray-400 text-xs overflow-hidden">
+                          <iframe
+                            src={`https://www.youtube.com/embed/${work.video_url.split("v=")[1]?.split("&")[0]}`}
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            className="w-full h-full"
+                          ></iframe>
                         </div>
-                      )}
+                      ) : null}
                     </TableCell>
                     <TableCell className="font-medium">{work.title}</TableCell>
                     <TableCell>{work.category}</TableCell>
@@ -287,6 +296,20 @@ export default function AdminWorksPage() {
               </Select>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="workType" className="text-right">
+                Type
+              </Label>
+              <Select name="workType" value={workType} onValueChange={(value: "image" | "video") => setWorkType(value)} required disabled={isPending}>
+                <SelectTrigger className="col-span-3 bg-gray-800 border-gray-700 text-white focus:ring-african-ochre focus:border-african-ochre">
+                  <SelectValue placeholder="Select a type" />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-800 border-gray-700 text-white">
+                  <SelectItem value="image">Image</SelectItem>
+                  <SelectItem value="video">Video</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="description" className="text-right">
                 Description
               </Label>
@@ -298,20 +321,41 @@ export default function AdminWorksPage() {
                 rows={4}
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="imageFile" className="text-right">
-                Image
-              </Label>
-              <div className="col-span-3">
-                <FileUpload
-                  name="imageFile"
-                  label="Upload Image"
-                  currentFileUrl={editingWork?.image_url}
-                  onFileChange={(file, dimensions) => setFileToUpload({ file, dimensions })}
-                  disabled={isPending}
+
+            {workType === "image" && (
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="imageFile" className="text-right">
+                  Image
+                </Label>
+                <div className="col-span-3">
+                  <FileUpload
+                    name="imageFile"
+                    label="Upload Image"
+                    currentFileUrl={editingWork?.image_url}
+                    onFileChange={(file, dimensions) => setFileToUpload({ file, dimensions })}
+                    disabled={isPending}
+                  />
+                </div>
+              </div>
+            )}
+
+            {workType === "video" && (
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="video_url" className="text-right">
+                  YouTube URL
+                </Label>
+                <Input
+                  id="video_url"
+                  name="video_url"
+                  defaultValue={editingWork?.video_url || ""}
+                  className="col-span-3 bg-gray-800 border-gray-700 text-white focus:ring-african-ochre focus:border-african-ochre"
+                  placeholder="e.g., https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                  required
                 />
               </div>
-            </div>
+            )}
+
+            
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="is_favorite" className="text-right">
                 Favorite
@@ -320,10 +364,9 @@ export default function AdminWorksPage() {
                 <Checkbox
                   id="is_favorite"
                   name="is_favorite"
-                  checked={isFavoriteState} // Use controlled component
-                  onCheckedChange={setIsFavoriteState} // Update state on change
+                  checked={isFavoriteState}
+                  onCheckedChange={(checked) => setIsFavoriteState(Boolean(checked))}
                   disabled={isPending}
-                  value="true" // Explicitly set value to 'true' when checked
                   className="border-gray-700 data-[state=checked]:bg-african-green data-[state=checked]:text-white"
                 />
                 <span className="text-sm text-gray-300">Mark as a favorite work</span>

@@ -23,7 +23,10 @@ const cinzel = Cinzel({
 export const metadata: Metadata = {
   title: "Divine Ameh - Celestial African Art",
   description: "A visionary artist bridging ancient African wisdom with contemporary celestial beauty.",
-    generator: 'v0.dev'
+  generator: 'v0.dev',
+  icons: {
+    icon: '/placeholder-logo.svg',
+  },
 }
 
 export default function RootLayout({

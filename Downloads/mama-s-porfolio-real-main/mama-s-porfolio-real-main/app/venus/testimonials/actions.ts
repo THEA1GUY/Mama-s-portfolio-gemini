@@ -1,6 +1,7 @@
 "use server"
 
-import { createServerClient } from "@/lib/supabase"
+import { createServerClient, createAdminClient } from "@/lib/supabase"
+import { cookies } from "next/headers"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 
@@ -25,7 +26,7 @@ export async function getTestimonials() {
 }
 
 export async function addTestimonial(formData: FormData) {
-  const supabase = createServerClient()
+  const supabase = createAdminClient()
   const name = formData.get("name") as string
   const role = formData.get("role") as string
   const text = formData.get("text") as string
@@ -57,7 +58,7 @@ export async function addTestimonial(formData: FormData) {
 }
 
 export async function updateTestimonial(id: string, formData: FormData) {
-  const supabase = createServerClient()
+  const supabase = createAdminClient()
   const name = formData.get("name") as string
   const role = formData.get("role") as string
   const text = formData.get("text") as string
@@ -89,7 +90,7 @@ export async function updateTestimonial(id: string, formData: FormData) {
 }
 
 export async function deleteTestimonial(id: string) {
-  const supabase = createServerClient()
+  const supabase = createAdminClient()
   const { error } = await supabase.from("testimonials").delete().eq("id", id)
 
   if (error) {
@@ -103,7 +104,7 @@ export async function deleteTestimonial(id: string) {
 }
 
 export async function toggleTestimonialApproval(id: string, currentApprovedStatus: boolean) {
-  const supabase = createServerClient()
+  const supabase = createAdminClient()
   const { error } = await supabase.from("testimonials").update({ approved: !currentApprovedStatus }).eq("id", id)
 
   if (error) {

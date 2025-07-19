@@ -1,6 +1,7 @@
 "use server"
 
-import { createServerClient } from "@/lib/supabase"
+import { createServerClient, createAdminClient } from "@/lib/supabase"
+import { cookies } from "next/headers"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 
@@ -12,7 +13,7 @@ const messageSchema = z.object({
 })
 
 export async function getMessages() {
-  const supabase = createServerClient()
+  const supabase = createAdminClient()
   const { data, error } = await supabase.from("messages").select("*").order("created_at", { ascending: false })
 
   if (error) {
@@ -36,7 +37,7 @@ export async function updateMessageStatus(id: string, read: boolean) {
 }
 
 export async function deleteMessage(id: string) {
-  const supabase = createServerClient()
+  const supabase = createAdminClient()
   const { error } = await supabase.from("messages").delete().eq("id", id)
 
   if (error) {

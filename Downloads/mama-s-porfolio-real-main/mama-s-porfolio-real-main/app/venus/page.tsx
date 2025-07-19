@@ -1,8 +1,11 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Users, MessageSquare, GalleryVertical, Star } from "lucide-react"
+import { getDashboardStats } from "@/lib/venus-data";
+import Link from "next/link";
 
-export default function AdminDashboardPage() {
+export default async function AdminDashboardPage() {
+  const { worksCount, messagesCount, testimonialsCount } = await getDashboardStats();
   return (
     <div className="space-y-8">
       <h1 className="text-4xl font-bold text-african-terracotta mb-8">Admin Dashboard</h1>
@@ -14,7 +17,7 @@ export default function AdminDashboardPage() {
             <GalleryVertical className="h-4 w-4 text-african-ochre" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">25</div>
+            <div className="text-2xl font-bold">{worksCount}</div>
             <p className="text-xs text-gray-400">+5 this month</p>
           </CardContent>
         </Card>
@@ -24,7 +27,7 @@ export default function AdminDashboardPage() {
             <MessageSquare className="h-4 w-4 text-african-ochre" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">7</div>
+            <div className="text-2xl font-bold">{messagesCount}</div>
             <p className="text-xs text-gray-400">+2 today</p>
           </CardContent>
         </Card>
@@ -34,7 +37,7 @@ export default function AdminDashboardPage() {
             <Star className="h-4 w-4 text-african-ochre" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12</div>
+            <div className="text-2xl font-bold">{testimonialsCount}</div>
             <p className="text-xs text-gray-400">+1 new</p>
           </CardContent>
         </Card>
@@ -63,19 +66,25 @@ export default function AdminDashboardPage() {
       <section className="bg-black/60 border border-purple-500/20 rounded-lg p-6">
         <h2 className="text-2xl font-bold text-african-terracotta mb-4">Quick Actions</h2>
         <div className="flex flex-wrap gap-4">
-          <Button className="bg-african-terracotta hover:bg-african-terracotta/90 text-white">Add New Work</Button>
-          <Button
-            variant="outline"
-            className="border-african-ochre text-african-ochre hover:bg-african-ochre hover:text-black bg-transparent"
-          >
-            View Messages
-          </Button>
-          <Button
-            variant="outline"
-            className="border-african-ochre text-african-ochre hover:bg-african-ochre hover:text-black bg-transparent"
-          >
-            Manage Testimonials
-          </Button>
+          <Link href="/venus/works/new">
+            <Button className="bg-african-terracotta hover:bg-african-terracotta/90 text-white">Add New Work</Button>
+          </Link>
+          <Link href="/venus/messages">
+            <Button
+              variant="outline"
+              className="border-african-ochre text-african-ochre hover:bg-african-ochre hover:text-black bg-transparent"
+            >
+              View Messages
+            </Button>
+          </Link>
+          <Link href="/venus/testimonials">
+            <Button
+              variant="outline"
+              className="border-african-ochre text-african-ochre hover:bg-african-ochre hover:text-black bg-transparent"
+            >
+              Manage Testimonials
+            </Button>
+          </Link>
         </div>
       </section>
     </div>
