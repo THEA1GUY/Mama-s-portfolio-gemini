@@ -4,6 +4,7 @@ import { createServerClient, createAdminClient } from "@/lib/supabase"
 import { cookies } from "next/headers"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
+import { Database } from "@/lib/database.types"
 
 // Define Zod schema for work data validation
 const workSchema = z.object({
@@ -41,13 +42,15 @@ export async function getWorks(isFavorite?: boolean) {
     query = query.eq("is_favorite", isFavorite)
   }
 
-  const { data, error } = await query.order("created_at", { ascending: false })
+  const { data, error } = await supabase
+    .from("works")
+    .select("*, image_width, image_height, is_favorite, type, video_url")
 
   if (error) {
     console.error("Error fetching works:", error)
     return { success: false, message: error.message, data: null }
   }
-  return { success: true, message: "Works fetched successfully", data }
+  return { success: true, message: "Works fetched successfully", data: data as Database['public']['Tables']['works']['Row'][] }
 }
 
 export async function addWork(formData: FormData) {

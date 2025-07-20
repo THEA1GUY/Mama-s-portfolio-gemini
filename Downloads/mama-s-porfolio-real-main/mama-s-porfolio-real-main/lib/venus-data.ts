@@ -1,5 +1,6 @@
 
 import { createServerClient } from '@/lib/supabase';
+import { Database } from "@/lib/database.types";
 
 export async function getDashboardStats() {
   const supabase = createServerClient();

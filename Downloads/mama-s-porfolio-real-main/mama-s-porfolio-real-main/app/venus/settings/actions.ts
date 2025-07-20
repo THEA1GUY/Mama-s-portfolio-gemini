@@ -4,6 +4,7 @@ import { createAdminClient, createServerClient } from "@/lib/supabase"
 import { cookies } from "next/headers"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
+import { Database } from "@/lib/database.types"
 
 // Define Zod schema for content setting data validation
 const contentSettingSchema = z.object({
@@ -69,7 +70,7 @@ export async function getContentSettings() {
     console.error("Error fetching content settings:", error)
     return { success: false, message: error.message, data: null }
   }
-  return { success: true, message: "Content settings fetched successfully", data }
+  return { success: true, message: "Content settings fetched successfully", data: data as Database['public']['Tables']['content_settings']['Row'][] }
 }
 
 export async function updateContentSetting(formData: FormData) {

@@ -4,6 +4,7 @@ import { createServerClient, createAdminClient } from "@/lib/supabase"
 import { cookies } from "next/headers"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
+import { Database } from "@/lib/database.types"
 
 // Define Zod schema for testimonial data validation
 const testimonialSchema = z.object({
@@ -22,7 +23,7 @@ export async function getTestimonials() {
     console.error("Error fetching testimonials:", error)
     return { success: false, message: error.message, data: null }
   }
-  return { success: true, message: "Testimonials fetched successfully", data }
+  return { success: true, message: "Testimonials fetched successfully", data: data as Database['public']['Tables']['testimonials']['Row'][] }
 }
 
 export async function addTestimonial(formData: FormData) {

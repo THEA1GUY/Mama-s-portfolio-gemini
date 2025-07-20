@@ -4,6 +4,7 @@ import { createServerClient, createAdminClient } from "@/lib/supabase"
 import { cookies } from "next/headers"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
+import { Database } from "@/lib/database.types"
 
 // Zod schema for contact form submission
 const messageSchema = z.object({
@@ -20,7 +21,7 @@ export async function getMessages() {
     console.error("Error fetching messages:", error)
     return { success: false, message: error.message, data: null }
   }
-  return { success: true, message: "Messages fetched successfully", data }
+  return { success: true, message: "Messages fetched successfully", data: data as Database['public']['Tables']['messages']['Row'][] }
 }
 
 export async function updateMessageStatus(id: string, read: boolean) {
