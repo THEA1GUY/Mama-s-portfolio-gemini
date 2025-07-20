@@ -134,6 +134,36 @@ export type Database = {
           },
         ]
       }
+      content_settings: {
+        Row: {
+          id: string
+          created_at: string
+          key: string
+          value_text: string | null
+          value_image_url: string | null
+          value_image_width: number | null
+          value_image_height: number | null
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          key: string
+          value_text?: string | null
+          value_image_url?: string | null
+          value_image_width?: number | null
+          value_image_height?: number | null
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          key?: string
+          value_text?: string | null
+          value_image_url?: string | null
+          value_image_width?: number | null
+          value_image_height?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
