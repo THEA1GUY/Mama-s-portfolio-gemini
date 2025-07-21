@@ -132,9 +132,9 @@ export default function AdminMessagesPage() {
                   >
                     <TableCell>
                       {message.read ? (
-                        <MailOpen className="h-5 w-5 text-gray-400" title="Read" />
+                        <MailOpen className="h-5 w-5 text-gray-400" />
                       ) : (
-                        <Mail className="h-5 w-5 text-african-ochre" title="Unread" />
+                        <Mail className="h-5 w-5 text-african-ochre" />
                       )}
                     </TableCell>
                     <TableCell>{message.name}</TableCell>

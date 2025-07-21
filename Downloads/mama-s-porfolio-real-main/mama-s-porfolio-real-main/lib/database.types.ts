@@ -18,6 +18,10 @@ export type Database = {
           image_width: number | null
           image_height: number | null
           is_favorite: boolean | null // Ensure this is present
+          type: "image" | "video"
+          video_url: string | null
+          thumbnail_url?: string | null
+          document_url?: string | null
         }
         Insert: {
           id?: string
@@ -30,6 +34,10 @@ export type Database = {
           image_width?: number | null
           image_height?: number | null
           is_favorite?: boolean | null // Ensure this is present
+          type?: "image" | "video"
+          video_url?: string | null
+          thumbnail_url?: string | null
+          document_url?: string | null
         }
         Update: {
           id?: string
@@ -42,6 +50,10 @@ export type Database = {
           image_width?: number | null
           image_height?: number | null
           is_favorite?: boolean | null // Ensure this is present
+          type?: "image" | "video"
+          video_url?: string | null
+          thumbnail_url?: string | null
+          document_url?: string | null
         }
         Relationships: []
       }

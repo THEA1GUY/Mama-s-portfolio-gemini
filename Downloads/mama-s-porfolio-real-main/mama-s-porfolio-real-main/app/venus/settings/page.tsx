@@ -25,7 +25,7 @@ export default function AdminContentSettingsPage() {
   const [settings, setSettings] = useState<Record<string, ContentSetting>>({}) // Map key to setting object
   const [loading, setLoading] = useState(true)
   const [isPending, startTransition] = useTransition()
-  const [fileToUpload, setFileToUpload] = useState<Record<string, { file: File | null; dimensions: { width: number; height: number } | null }>>({})
+  const [fileToUpload, setFileToUpload] = useState<Record<string, { file: File | null; dimensions: { width: number; height: number } | null | undefined }>>({})
   const { toast } = useToast()
 
   const fetchSettings = async () => {
@@ -51,7 +51,7 @@ export default function AdminContentSettingsPage() {
     fetchSettings()
   }, [])
 
-  const handleFileChange = (key: string, file: File | null, dimensions: { width: number; height: number } | null) => {
+  const handleFileChange = (key: string, file: File | null, dimensions: { width: number; height: number } | null | undefined) => {
     setFileToUpload((prev) => ({
       ...prev,
       [key]: { file, dimensions },

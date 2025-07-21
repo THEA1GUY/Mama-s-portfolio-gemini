@@ -36,21 +36,19 @@ export async function getWorks(isFavorite?: boolean) {
   const supabase = createAdminClient()
   let query = supabase
     .from("works")
-    .select("*, image_width, image_height, is_favorite, type, video_url")
+    .select("*, image_width, image_height, is_favorite, type, video_url, document_url, thumbnail_url")
 
   if (isFavorite !== undefined) {
     query = query.eq("is_favorite", isFavorite)
   }
 
-  const { data, error } = await supabase
-    .from("works")
-    .select("*, image_width, image_height, is_favorite, type, video_url")
+  const { data, error } = await query
 
   if (error) {
     console.error("Error fetching works:", error)
     return { success: false, message: error.message, data: null }
   }
-  return { success: true, message: "Works fetched successfully", data: data as Database['public']['Tables']['works']['Row'][] }
+  return { success: true, message: "Works fetched successfully", data }
 }
 
 export async function addWork(formData: FormData) {

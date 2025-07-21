@@ -24,8 +24,8 @@ interface Work {
   is_favorite: boolean | null
   type: "image" | "video" | "document" // New: type of work
   video_url: string | null // New: video URL
-  document_url: string | null // New: document URL
-  thumbnail_url: string | null // New: thumbnail URL
+  document_url: string | null | undefined // New: document URL
+  thumbnail_url: string | null | undefined // New: thumbnail URL
 }
 
 export default function WorksPage() {
@@ -155,7 +155,7 @@ export default function WorksPage() {
               >
                 {work.type === "image" && work.image_url ? (
                   <GalleryFrame
-                    src={work.image_url || undefined} // Pass undefined if null, GalleryFrame will use its fallback
+                    src={work.image_url || ''} // Pass undefined if null, GalleryFrame will use its fallback
                     alt={work.title}
                     width={work.image_width || 600} // Use dynamic width, fallback to 600
                     height={work.image_height || 400} // Use dynamic height, fallback to 400
@@ -245,7 +245,7 @@ export default function WorksPage() {
             </div>
           </div>
         </div>
-      )}}
+      )}
 
       {/* Video Lightbox Modal */}
       {selectedVideo && (
@@ -264,7 +264,7 @@ export default function WorksPage() {
             <div className="relative w-full lg:w-2/3 h-0 pb-[56.25%] bg-black rounded-lg overflow-hidden">
               <iframe
                 className="absolute top-0 left-0 w-full h-full"
-                src={`https://www.youtube.com/embed/${getYouTubeVideoId(selectedVideo.video_url)}?autoplay=1`}
+                src={`https://www.youtube.com/embed/${getYouTubeVideoId(selectedVideo.video_url!)}?autoplay=1`}
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen

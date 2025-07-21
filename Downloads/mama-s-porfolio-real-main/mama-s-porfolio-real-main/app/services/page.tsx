@@ -19,12 +19,12 @@ interface ContentSetting {
 }
 
 export default function ServicesPage() {
-  const [servicesHeaderRef, servicesHeaderInView] = useInView()
-  const [culturalPhotographyRef, culturalPhotographyInView] = useInView()
-  const [afrofuturisticArtRef, afrofuturisticArtInView] = useInView()
-  const [spiritualDesignRef, spiritualDesignInView] = useInView()
-  const [whyChooseMeRef, whyChooseMeInView] = useInView()
-  const [ctaRef, ctaInView] = useInView()
+  const [servicesHeaderRef, servicesHeaderInView] = useInView<HTMLDivElement>()
+  const [culturalPhotographyRef, culturalPhotographyInView] = useInView<HTMLElement>()
+  const [afrofuturisticArtRef, afrofuturisticArtInView] = useInView<HTMLElement>()
+  const [spiritualDesignRef, spiritualDesignInView] = useInView<HTMLElement>()
+  const [whyChooseMeRef, whyChooseMeInView] = useInView<HTMLElement>()
+  const [ctaRef, ctaInView] = useInView<HTMLElement>()
 
   const [contentSettings, setContentSettings] = useState<Record<string, ContentSetting>>({}) // State to hold settings
 
@@ -153,7 +153,7 @@ export default function ServicesPage() {
             </div>
             <div className="order-1 md:order-2 relative w-full h-auto overflow-hidden">
               <GalleryFrame
-                src={servicesCulturalPhotographyImage?.value_image_url || undefined}
+                src={servicesCulturalPhotographyImage?.value_image_url || ''}
                 alt="Cultural Photography"
                 width={servicesCulturalPhotographyImage?.value_image_width || 600}
                 height={servicesCulturalPhotographyImage?.value_image_height || 400}
@@ -173,7 +173,7 @@ export default function ServicesPage() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="relative w-full h-auto overflow-hidden">
               <GalleryFrame
-                src={servicesAfrofuturisticArtImage?.value_image_url || undefined}
+                src={servicesAfrofuturisticArtImage?.value_image_url || ''}
                 alt="Afrofuturistic Art"
                 width={servicesAfrofuturisticArtImage?.value_image_width || 600}
                 height={servicesAfrofuturisticArtImage?.value_image_height || 400}
@@ -231,7 +231,7 @@ export default function ServicesPage() {
             </div>
             <div className="order-1 md:order-2 relative w-full h-auto overflow-hidden">
               <GalleryFrame
-                src={servicesSpiritualDesignImage?.value_image_url || undefined}
+                src={servicesSpiritualDesignImage?.value_image_url || ''}
                 alt="Spiritual Design"
                 width={servicesSpiritualDesignImage?.value_image_width || 600}
                 height={servicesSpiritualDesignImage?.value_image_height || 400}

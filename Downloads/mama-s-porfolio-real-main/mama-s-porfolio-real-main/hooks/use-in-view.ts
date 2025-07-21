@@ -3,8 +3,8 @@
 import { useRef, useState, useEffect } from "react"
 
 // Custom hook for Intersection Observer for single elements
-export function useInView() {
-  const ref = useRef<HTMLElement>(null)
+export function useInView<T extends HTMLElement>() {
+  const ref = useRef<T>(null)
   const [inView, setInView] = useState(false)
 
   useEffect(() => {

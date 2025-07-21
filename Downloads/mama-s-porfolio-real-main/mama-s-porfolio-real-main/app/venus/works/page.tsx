@@ -30,6 +30,7 @@ interface Work {
   is_favorite: boolean | null
   type: "image" | "video"
   video_url: string | null
+  thumbnail_url?: string | null
 }
 
 const categories = ["Photography", "Videography"]
@@ -40,7 +41,7 @@ export default function AdminWorksPage() {
   const [isPending, startTransition] = useTransition()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingWork, setEditingWork] = useState<Work | null>(null)
-  const [fileToUpload, setFileToUpload] = useState<{ file: File | null; dimensions: { width: number; height: number } | null }>({ file: null, dimensions: null })
+  const [fileToUpload, setFileToUpload] = useState<{ file: File | null; dimensions: { width: number; height: number } | null | undefined }>({ file: null, dimensions: null })
   const [isFavoriteState, setIsFavoriteState] = useState(false)
   const [workType, setWorkType] = useState<"image" | "video">("image")
   const { toast } = useToast()

@@ -14,7 +14,7 @@ interface Testimonial {
 }
 
 export default async function TestimonialsSection() {
-  const supabase = createServerClient(cookies());
+  const supabase = createServerClient();
   const { data: testimonials, error } = await supabase
     .from("testimonials")
     .select("*")

@@ -16,6 +16,7 @@ interface Work {
   is_favorite: boolean | null;
   type: "image" | "video";
   video_url: string | null;
+  thumbnail_url?: string | null;
 }
 
 // Helper function to extract YouTube video ID
@@ -63,7 +64,7 @@ export default async function PortfolioSection() {
                   />
                 ) : work.type === "image" && work.image_url ? (
                   <GalleryFrame
-                    src={work.image_url || undefined}
+                    src={work.image_url || ''}
                     alt={work.title}
                     width={work.image_width || 300}
                     height={work.image_height || 300}

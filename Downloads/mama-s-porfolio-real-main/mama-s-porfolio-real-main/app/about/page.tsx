@@ -19,12 +19,12 @@ interface ContentSetting {
 }
 
 export default function AboutPage() {
-  const [aboutHeaderRef, aboutHeaderInView] = useInView()
-  const [artistStatementTextRef, artistStatementTextInView] = useInView()
-  const [portraitRef, portraitInView] = useInView()
-  const [journeyRef, journeyInView] = useInView()
-  const [philosophyRef, philosophyInView] = useInView()
-  const [ctaRef, ctaInView] = useInView()
+  const [aboutHeaderRef, aboutHeaderInView] = useInView<HTMLDivElement>()
+  const [artistStatementTextRef, artistStatementTextInView] = useInView<HTMLDivElement>()
+  const [portraitRef, portraitInView] = useInView<HTMLDivElement>()
+  const [journeyRef, journeyInView] = useInView<HTMLElement>()
+  const [philosophyRef, philosophyInView] = useInView<HTMLElement>()
+  const [ctaRef, ctaInView] = useInView<HTMLElement>()
 
   const [contentSettings, setContentSettings] = useState<Record<string, ContentSetting>>({}) // State to hold settings
 

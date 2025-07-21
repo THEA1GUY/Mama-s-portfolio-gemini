@@ -187,9 +187,9 @@ export default function AdminTestimonialsPage() {
                         className="hover:bg-transparent"
                       >
                         {testimonial.approved ? (
-                          <CheckCircle className="h-5 w-5 text-african-green" title="Approved" />
+                          <CheckCircle className="h-5 w-5 text-african-green" />
                         ) : (
-                          <XCircle className="h-5 w-5 text-red-500" title="Not Approved" />
+                          <XCircle className="h-5 w-5 text-red-500" />
                         )}
                       </Button>
                     </TableCell>
