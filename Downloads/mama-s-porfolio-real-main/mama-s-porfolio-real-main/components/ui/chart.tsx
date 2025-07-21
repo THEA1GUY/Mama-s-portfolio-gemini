@@ -104,15 +104,20 @@ const ChartTooltip = RechartsPrimitive.Tooltip
 
 const ChartTooltipContent = React.forwardRef<
   HTMLDivElement,
-  React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
-    React.ComponentProps<"div"> & {
-      payload?: any;
-      hideLabel?: boolean
-      hideIndicator?: boolean
-      indicator?: "line" | "dot" | "dashed"
-      nameKey?: string
-      labelKey?: string
-    }
+  React.ComponentProps<"div"> & {
+    active?: boolean;
+    payload?: RechartsPrimitive.TooltipProps<any, any>["payload"];
+    label?: any;
+    labelFormatter?: RechartsPrimitive.TooltipProps<any, any>["labelFormatter"];
+    labelClassName?: string;
+    formatter?: RechartsPrimitive.TooltipProps<any, any>["formatter"];
+    color?: string;
+    nameKey?: string;
+    labelKey?: string;
+    hideLabel?: boolean;
+    hideIndicator?: boolean;
+    indicator?: "line" | "dot" | "dashed";
+  }
 >(
   (
     {
