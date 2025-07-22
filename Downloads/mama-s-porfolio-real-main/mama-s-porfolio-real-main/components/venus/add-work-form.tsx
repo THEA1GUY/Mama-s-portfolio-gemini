@@ -13,6 +13,7 @@ import { useRouter } from 'next/navigation';
 export function AddWorkForm() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [category, setCategory] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -64,6 +65,7 @@ export function AddWorkForm() {
       {
         title,
         description,
+        category,
         image_url: publicUrlData.publicUrl,
       },
     ]);
@@ -102,6 +104,15 @@ export function AddWorkForm() {
           id="description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
+          className="bg-gray-800 border-gray-700 text-white"
+        />
+      </div>
+      <div>
+        <Label htmlFor="category">Category</Label>
+        <Input
+          id="category"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
           className="bg-gray-800 border-gray-700 text-white"
         />
       </div>
