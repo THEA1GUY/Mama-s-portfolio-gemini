@@ -12,7 +12,7 @@ export const createClient = () => {
     {
       cookies: {
         get(name: string) {
-          return cookieStore.get(name)?.value;
+          return (await cookieStore).get(name)?.value;
         },
         set(name: string, value: string, options: CookieOptions) {
           cookieStore.set({ name, value, ...options });
