@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 import type { Database } from './database.types';
 
 export function createClient() {
-  const cookieStore = cookies();
+  const cookieStore = cookies() as ReadonlyRequestCookies;
 
   return createSupabaseServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
