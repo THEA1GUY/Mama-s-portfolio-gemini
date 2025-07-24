@@ -4,8 +4,6 @@ import { Home, GalleryVertical, Users, MessageSquare, Settings, LogOut } from "l
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Toaster } from "@/components/ui/toaster"
-
-import type React from "react"
 import Link from "next/link"
 import { Home, GalleryVertical, Users, MessageSquare, Settings, LogOut } from "lucide-react"
 import { cn } from "@/lib/utils"
