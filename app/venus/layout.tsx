@@ -5,13 +5,21 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Toaster } from "@/components/ui/toaster"
 
-export default async function VenusLayout({ children }: { children: React.ReactNode }) {
-  // No authentication checks here, direct access
+import type React from "react"
+import Link from "next/link"
+import { Home, GalleryVertical, Users, MessageSquare, Settings, LogOut } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { Toaster } from "@/components/ui/toaster"
+import { useRouter } from "next/navigation"
 
-  const handleSignOut = async () => {
-    "use server"
-    console.log("Sign out action triggered (no authentication).")
-  }
+export default function VenusLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+
+  const handleSignOut = () => {
+    document.cookie = "venus_authenticated=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    router.push("/login");
+  };
 
   return (
     <div className="flex min-h-screen bg-black text-white">
