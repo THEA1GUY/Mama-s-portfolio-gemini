@@ -1,5 +1,5 @@
-import { createServerClient } from "@/lib/supabase";
-import { cookies } from "next/headers";
+"use client"
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Star } from "lucide-react";
 
@@ -13,17 +13,40 @@ interface Testimonial {
   created_at: string;
 }
 
-export default async function TestimonialsSection() {
-  const supabase = createServerClient();
-  const { data: testimonials, error } = await supabase
-    .from("testimonials")
-    .select("*")
-    .eq("approved", true) // Only fetch approved testimonials
-    .order("created_at", { ascending: false });
+export default function TestimonialsSection() {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      try {
+        const response = await fetch('/.netlify/functions/testimonials');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const result = await response.json();
+        if (result.success && result.data) {
+          setTestimonials(result.data.filter((t: Testimonial) => t.approved));
+        } else {
+          setError(result.message || "Failed to fetch testimonials.");
+        }
+      } catch (e: any) {
+        setError(e.message || "An unexpected error occurred.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTestimonials();
+  }, []);
+
+  if (loading) {
+    return <p className="text-center text-gray-500">Loading testimonials...</p>;
+  }
 
   if (error) {
-    console.error("Error fetching testimonials for homepage:", error);
-    return <p className="text-center text-gray-500">Failed to load testimonials.</p>;
+    return <p className="text-center text-red-500">Error: {error}</p>;
   }
 
   if (!testimonials || testimonials.length === 0) {
